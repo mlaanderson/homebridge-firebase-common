@@ -1,0 +1,24 @@
+{
+  "name": "homebridge-firebase-common",
+  "version": "0.0.1",
+  "description": "Common files for dealing with a Homebridge (HomeKit) database in Javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mlaanderson/homebridge-firebase-common.git"
+  },
+  "keywords": [
+    "homebridge",
+    "homebridge-plugin",
+    "firebase"
+  ],
+  "author": "Michael Anderson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mlaanderson/homebridge-firebase-common/issues"
+  },
+  "homepage": "https://github.com/mlaanderson/homebridge-firebase-common#readme"
+}
