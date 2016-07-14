@@ -5,5 +5,5 @@ var Accessory = require('./lib/accessory.js');
 
 module.exports = {
     Accessory: Accessory,
-    Service: Service;
+    Service: Service
 }
