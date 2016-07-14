@@ -1091,8 +1091,8 @@ function Accessory(ref) {
         });
         _ref.child('Name').on('value', _nameHandler.bind(this));
         
-        for (var n = 0; n < service.Services.Implemented.length; n++) {
-            defineServiceProperty(this, ref, service.Services.Implemented[n]);
+        for (var k in service.Services) {
+            defineServiceProperty(this, ref, k);
         }
         
         _ready = true;
@@ -1156,9 +1156,9 @@ function Service(ref, serviceName) {
     function _scanCharacteristics(snapshot) {
         var _service = snapshot.val();
         
-        for (var n = 0; n < _service.Characteristics.Implemented.length; n++) {
-            addCharacteristic(this, _ref, _service.Characteristics.Implemented[n],
-                _service.Characteristics[_service.Characteristics.Implemented[n]]);
+        for (var k in _service.Characteristics) {
+            addCharacteristic(this, _ref, k,
+                _service.Characteristics[k]);
         }
     }
     
