@@ -54,6 +54,7 @@ class FirebaseAccessory {
                 var characteristic = service.getCharacteristic(Characteristic[characteristicName]);
                 var charType = Types.Characteristic[characteristicName];
                 
+                this._characteristicMap[serviceName][characteristicName] = characteristic;
                 
                 // attach the firebase specific information to the characteristic
                 var bindData = {
