@@ -24,6 +24,19 @@ class FirebaseAccessory {
             email: this._config.username,
             password: this._config.password
         });
+        
+        this._serviceMap = {};
+        this._characteristicMap = {};
+        
+        for (var serviceName in this._config.services) {
+            this._serviceMap[serviceName] = new Service[serviceName]();
+            this._characteristicMap[serviceName] = {};
+            
+            for (var characteristicName of this._config.services[serviceName]) {
+                this._characteristicMap[serviceName][characteristicName] =
+                    this._serviceMap[serviceName].getCharacteristic(characteristicName);
+            }
+        }
     }
     
     /**
@@ -36,20 +49,13 @@ class FirebaseAccessory {
      * the AccessoryBase event and relay the notification to Homebridge.
      */
     _accessoryReady() {
-        this._services = [];
-        this._serviceMap = {};
-        this._characteristicMap = {};
-        
         for (var serviceName of this._accessory.Services) {
-            var service = new Service[serviceName](this._config.name);
-            this._serviceMap[serviceName] = service;
-            this._characteristicMap[serviceName] = [];
+            var service = this._serviceMap[serviceName];
             
             for (var characteristicName of this._accessory[serviceName].Characteristics) {
-                var characteristic = service.getCharacteristic(Characteristic[characteristicName]);
+                var characteristic = this._characteristicMap[serviceName][characteristicName];
                 var charType = Types.Characteristics[characteristicName];
                 
-                this._characteristicMap[serviceName][characteristicName] = characteristic;
                 
                 // attach the firebase specific information to the characteristic
                 var bindData = {
@@ -73,8 +79,6 @@ class FirebaseAccessory {
                     this._accessory[serviceName].on(characteristicName, this._notifyHandler.bind(bindData));
                 }
             }
-            
-            this._services.push(service);
         }
     }
     
@@ -140,6 +144,10 @@ class FirebaseAccessory {
      * services.
      */
     getServices() {
-        return this._service;
+        var services = [];
+        for (var k in this._serviceMap) {
+            services.push(this._serviceMap[k]);
+        }
+        return services;
     }
 }
