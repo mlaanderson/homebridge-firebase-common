@@ -30,12 +30,6 @@ class FirebaseAccessory {
         
         for (var serviceName in this._config.services) {
             this._serviceMap[serviceName] = new Service[serviceName]();
-            this._characteristicMap[serviceName] = {};
-            
-            for (var characteristicName of this._config.services[serviceName]) {
-                this._characteristicMap[serviceName][characteristicName] =
-                    this._serviceMap[serviceName].getCharacteristic(characteristicName);
-            }
         }
     }
     
@@ -57,8 +51,8 @@ class FirebaseAccessory {
             for (var characteristicName of this._accessory[serviceName].Characteristics) {
                 this.log("Populating Characteristic:", serviceName, characteristicName);
                 
-                var characteristic = this._characteristicMap[serviceName][characteristicName];
-                var charType = Types.Characteristics[characteristicName];
+                var characteristic = service.getCharacteristic(Characteristic[characteristicName]);
+                var charType = Types.Characteristic[characteristicName];
                 
                 
                 // attach the firebase specific information to the characteristic
@@ -99,7 +93,7 @@ class FirebaseAccessory {
      * just callback with that shadow value.
      */
     _getHandler(callback) {
-        this.log("_getHandler", this.Service, this.Characteristic);
+        this.Accessory.log("_getHandler", this.Service, this.Characteristic);
         callback(null, this.Accessory._accessory[this.Service][this.Characteristic]);
     }
     
@@ -117,7 +111,7 @@ class FirebaseAccessory {
         // the Firebase database values as properties, so
         // just set the property and the AccessoryBase
         // will update the Firebase database.
-        this.log("_setHandler", this.Service, this.Characteristic, value);
+        this.Accessory.log("_setHandler", this.Service, this.Characteristic, value);
         this.Accessory._accessory[this.Service][this.Characteristic] = value;
         callback(null, this.Accessory._accessory[this.Service][this.Characteristic]);
     }
@@ -132,7 +126,7 @@ class FirebaseAccessory {
      *   }
      */
     _notifyHandler(value) {
-        this.log("_notifyHandler", this.Service, this.Characteristic, value);
+        this.Accessory.log("_notifyHandler", this.Service, this.Characteristic, value);
         this.Accessory._characteristicMap[this.Service][this.Characteristic].setValue(value);
     }
     
