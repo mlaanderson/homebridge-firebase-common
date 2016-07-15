@@ -1064,8 +1064,9 @@ function Accessory(ref) {
     
     function _checkReady() {
         if (_ready) return;
+        
         for (var n = 0; n < this._services.length; n++) {
-            if (this._services[n].a == false) return;
+            if (this._services[n].IsReady == false) return;
         }
         
         _ready = true;
@@ -1171,6 +1172,10 @@ function Service(ref, serviceName) {
             addCharacteristic(this, _ref, k,
                 _service.Characteristics[k]);
         }
+            
+        // emit ready
+        _ready = true;
+        this.emit('ready');
     }
     
     function _onAuth(authData) {
@@ -1180,10 +1185,6 @@ function Service(ref, serviceName) {
             
             // scan the Window characteristics
             _ref.once('value', _scanCharacteristics.bind(this));
-            
-            // emit ready
-            _ready = true;
-            this.emit('ready');
         }
     }
     
