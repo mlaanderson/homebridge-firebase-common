@@ -2,8 +2,10 @@
 
 var Service = require('./lib/service.js');
 var Accessory = require('./lib/accessory.js');
+var HapTypes = require('hap-nodejs-types');
 
 module.exports = {
     Accessory: Accessory,
-    Service: Service
+    Service: Service,
+    Types: HapTypes
 }

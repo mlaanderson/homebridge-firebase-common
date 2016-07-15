@@ -20,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/mlaanderson/homebridge-firebase-common/issues"
   },
-  "homepage": "https://github.com/mlaanderson/homebridge-firebase-common#readme"
+  "homepage": "https://github.com/mlaanderson/homebridge-firebase-common#readme",
+  "dependencies": {
+    "hap-nodejs-types": "git+https://github.com/mlaanderson/HAP-NodeJS-Types.git"
+  },
+  "devDependencies": {
+    "firebase": "^2.4.1"
+  }
 }
