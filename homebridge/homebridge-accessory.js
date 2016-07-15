@@ -1,6 +1,6 @@
 "use strict";
 var Firebase = require('firebase');
-var AccessoryBase = require('../lib/accessory.js');
+var AccessoryBase = require('homebridge-firebase-common').Accessory;
 var Types = require('hap-nodejs-types');
 
 var Service, Characteristic;

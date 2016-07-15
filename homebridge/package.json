@@ -1,0 +1,24 @@
+{
+  "name": "homebridge-accessory",
+  "version": "0.1.0",
+  "description": "An example homebridge plugin using the homebridge-firebase-common library",
+  "main": "homebridge-accessory.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "homebridge": ">=0.2.0"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "firebase",
+    "homebridge-firebase-common"
+  ],
+  "author": "Michael Anderson",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^2.4.1",
+    "hap-nodejs-types": "git+https://github.com/mlaanderson/HAP-NodeJS-Types.git",
+    "homebridge-firebase-common": "git+https://github.com/mlaanderson/homebridge-firebase-common.git"
+  }
+}
