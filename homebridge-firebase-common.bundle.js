@@ -1041,7 +1041,8 @@ var Service = require('./service.js');
 function defineServiceProperty(self, ref, serviceName) {
     var service = new Service(ref, serviceName);
     
-    self._services.push(serviceName);
+    self._serviceNames.push(serviceName);
+    self._services.push(service);
 
     Object.defineProperty(self, serviceName, {
         get: function() { return service; }
@@ -1053,11 +1054,22 @@ function Accessory(ref) {
     var _ref = ref;
     var _ready = false;
     
+    this._serviceNames = [];
     this._services = [];
     
     function _nameHandler(snapshot) {
         _shadow.Name = snapshot.val();
         this.emit('Name', _shadow.Name);
+    }
+    
+    function _checkReady() {
+        if (_ready) return;
+        for (var n = 0; n < this._services.length; n++) {
+            if (this._services[n].a == false) return;
+        }
+        
+        _ready = true;
+        this.emit('ready');
     }
     
     function _scanServices(snapshot) {
@@ -1077,8 +1089,9 @@ function Accessory(ref) {
             defineServiceProperty(this, ref, k);
         }
         
-        _ready = true;
-        this.emit('ready');
+        for (var n = 0; n < this._services.length; n++) {
+            this._services[n].ready(_checkReady.bind(this));
+        }
     }
     
     function _onAuth(authData) {
@@ -1100,7 +1113,7 @@ function Accessory(ref) {
      
     Object.defineProperty(this, 'Services', {
         get: function() {
-            return this._services.slice(0);
+            return this._serviceNames.slice(0);
         }
     });
     
@@ -1147,6 +1160,7 @@ function addCharacteristic(self, ref, characteristicName, value) {
 
 function Service(ref, serviceName) {
     var _ref = ref.child('Services/' + serviceName);
+    var _ready = false;
     
     this._characteristics = [];
 
@@ -1166,13 +1180,30 @@ function Service(ref, serviceName) {
             
             // scan the Window characteristics
             _ref.once('value', _scanCharacteristics.bind(this));
+            
+            // emit ready
+            _ready = true;
+            this.emit('ready');
         }
     }
+    
+    this.ready = function(callback) {
+        if (_ready) {
+            callback();
+        } else {
+            this.on('ready', callback);
+        }
+        return this;
+    };
     
     Object.defineProperty(this, 'Characteristics', {
         get: function() {
             return this._characteristics.slice(0);
         }
+    });
+    
+    Object.defineProperty(this, 'IsReady', {
+        get: function() { return _ready; }
     });
     
     // Initialization
