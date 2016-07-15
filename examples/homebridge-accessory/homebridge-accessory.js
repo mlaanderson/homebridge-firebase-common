@@ -28,7 +28,7 @@ class FirebaseAccessory {
         this._serviceMap = {};
         this._characteristicMap = {};
         
-        for (var serviceName in this._config.services) {
+        for (var serviceName of this._config.services) {
             this._serviceMap[serviceName] = new Service[serviceName]();
             this._characteristicMap[serviceName] = {};
         }
@@ -56,6 +56,7 @@ class FirebaseAccessory {
                 var charType = Types.Characteristic[characteristicName];
                 
                 this._characteristicMap[serviceName][characteristicName] = characteristic;
+                
                 
                 // attach the firebase specific information to the characteristic
                 var bindData = {
