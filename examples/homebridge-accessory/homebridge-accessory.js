@@ -52,7 +52,11 @@ class FirebaseAccessory {
         for (var serviceName of this._accessory.Services) {
             var service = this._serviceMap[serviceName];
             
+            this.log("Populating Service:", serviceName);
+            
             for (var characteristicName of this._accessory[serviceName].Characteristics) {
+                this.log("Populating Characteristic:", serviceName, characteristicName);
+                
                 var characteristic = this._characteristicMap[serviceName][characteristicName];
                 var charType = Types.Characteristics[characteristicName];
                 
@@ -90,11 +94,12 @@ class FirebaseAccessory {
            Service: the service name of this characteristic,
            Characteristic: the characteristic name
      *   }
+     * The AccessoryBase object maintains a shadow of
+     * the Firebase database values as properties, so
+     * just callback with that shadow value.
      */
     _getHandler(callback) {
-        // The AccessoryBase object maintains a shadow of
-        // the Firebase database values as properties, so
-        // just callback with that shadow value.
+        this.log("_getHandler", this.Service, this.Characteristic);
         callback(null, this.Accessory._accessory[this.Service][this.Characteristic]);
     }
     
@@ -112,6 +117,7 @@ class FirebaseAccessory {
         // the Firebase database values as properties, so
         // just set the property and the AccessoryBase
         // will update the Firebase database.
+        this.log("_setHandler", this.Service, this.Characteristic, value);
         this.Accessory._accessory[this.Service][this.Characteristic] = value;
         callback(null, this.Accessory._accessory[this.Service][this.Characteristic]);
     }
@@ -126,6 +132,7 @@ class FirebaseAccessory {
      *   }
      */
     _notifyHandler(value) {
+        this.log("_notifyHandler", this.Service, this.Characteristic, value);
         this.Accessory._characteristicMap[this.Service][this.Characteristic].setValue(value);
     }
     
