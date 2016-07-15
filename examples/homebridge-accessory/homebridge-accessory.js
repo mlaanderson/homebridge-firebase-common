@@ -30,6 +30,7 @@ class FirebaseAccessory {
         
         for (var serviceName in this._config.services) {
             this._serviceMap[serviceName] = new Service[serviceName]();
+            this._characteristicMap[serviceName] = {};
         }
     }
     
