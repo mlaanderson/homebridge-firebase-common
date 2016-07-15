@@ -1062,6 +1062,8 @@ var Service = require('./service.js');
 
 function defineServiceProperty(self, ref, serviceName) {
     var service = new Service(ref, serviceName);
+    
+    self._services.push(seviceName);
 
     Object.defineProperty(self, serviceName, {
         get: function() { return service; }
@@ -1072,6 +1074,8 @@ function Accessory(ref) {
     var _shadow = {};
     var _ref = ref;
     var _ready = false;
+    
+    this._services = [];
     
     function _nameHandler(snapshot) {
         _shadow.Name = snapshot.val();
@@ -1116,7 +1120,12 @@ function Accessory(ref) {
         return this;
     };
     
-    ref.onAuth(_onAuth.bind(this));
+    // Initialization
+    if (_ref.onAuth) { // v 2.4.x
+        _ref.onAuth(_onAuth.bind(this));
+    } else if (_ref.database.app.auth) { // v 3.0.x
+        _ref.database.app.auth().onAuthStateChanged(_onAuth.bind(this));
+    }
 }
 
 util.inherits(Accessory, EventEmitter);
@@ -1135,6 +1144,8 @@ var util = require('util');
 function addCharacteristic(self, ref, characteristicName, value) {
     var _shadow = value;
     
+    self._characteristics.push(characteristicName);
+    
     function _changeHandler(snapshot) {
         _shadow = snapshot.val();
         self.emit(characteristicName, _shadow);
@@ -1152,6 +1163,8 @@ function addCharacteristic(self, ref, characteristicName, value) {
 
 function Service(ref, serviceName) {
     var _ref = ref.child('Services/' + serviceName);
+    
+    this._characteristics = [];
 
     function _scanCharacteristics(snapshot) {
         var _service = snapshot.val();
@@ -1172,8 +1185,18 @@ function Service(ref, serviceName) {
         }
     }
     
+    Object.defineProperty(this, 'Characteristics', {
+        get: function() {
+            return this._characteristics.slice(0);
+        }
+    });
+    
     // Initialization
-    _ref.onAuth(_onAuth.bind(this));
+    if (_ref.onAuth) { // v 2.4.x
+        _ref.onAuth(_onAuth.bind(this));
+    } else if (_ref.database.app.auth) { // v 3.0.x
+        _ref.database.app.auth().onAuthStateChanged(_onAuth.bind(this));
+    }
 }
 
 util.inherits(Service, EventEmitter);
