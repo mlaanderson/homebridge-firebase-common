@@ -1158,6 +1158,7 @@ function Platform(ref, filter) {
     var _ready = false;
     var _accessories = [];
     var _accessoryNames = [];
+    var _friendlyNames = [];
     var _filter = filter || /.*/;
     
     _filter = new RegExp(_filter); // in case it's passed as a string
@@ -1166,6 +1167,24 @@ function Platform(ref, filter) {
         if (_ready) return;
         for (var n = 0; n < _accessories.length; n++) {
             if (_accessories[n].IsReady == false) return;
+            
+            if ((_accessories[n].AccessoryInformation !== undefined) &&
+                (_accessories[n].AccessoryInformation.Name !== undefined)
+            ) {
+                var name = _accessories[n].AccessoryInformation.Name;
+                // add this by it's friendly name
+                if (_friendlyNames.indexOf(name) < 0) {
+                    createAccessoryProp(this, name, _accessories[n]);
+                    _friendlyNames.push(name);
+                    
+                    try {
+                        name = name.replace(/[ \.\[\]\{\}\(\)]/g, '');
+                        createAccessoryProp(this, name, _accessories[n]);
+                    } catch (error) {
+                        
+                    }
+                }
+            }
         }
         
         _ready = true;
@@ -1211,8 +1230,14 @@ function Platform(ref, filter) {
     });
     
     Object.defineProperty(this, 'Accessories', {
-        get: function() { return this._accessoryNames.slice(0); }
+        get: function() { return _accessoryNames.slice(0); }
     });
+    
+    Object.defineProperty(this, 'Names', {
+        get: function() { return _friendlyNames.slice(0); }
+    });
+    
+    _ref.onAuth(_onAuth.bind(this));
 }
 
 util.inherits(Platform, EventEmitter);
