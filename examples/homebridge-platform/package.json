@@ -1,0 +1,24 @@
+{
+  "name": "homebridge-platform",
+  "version": "0.0.1",
+  "description": "Firebase platform plugin for Homebridge",
+  "main": "homebridge-accessory.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "firebase",
+    "homebridge-firebase-common"
+  ],
+  "engines": {
+    "homebridge": ">=0.2.0"
+  },
+  "author": "Michael Anderson",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^2.4.1",
+    "hap-nodejs-types": "git+https://github.com/mlaanderson/HAP-NodeJS-Types.git",
+    "homebridge-firebase-common": "git+https://github.com/mlaanderson/homebridge-firebase-common.git"
+  }
+}

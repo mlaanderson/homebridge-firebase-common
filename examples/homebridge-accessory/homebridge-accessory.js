@@ -11,26 +11,63 @@ module.exports = function(homebridge) {
     homebridge.registerAccessory("homebridge-accessory", "FirebaseAccessory", FirebaseAccessory);
 }
 
+module.exports.FirebaseAccessory = FirebaseAccessory;
+
 class FirebaseAccessory {
     constructor(log, config) {
-        this.log = log;
-        this._config = config;
-        
-        this._db = new Firebase(this._config.firebase_host);
-        this._accessory = new AccessoryBase(this._db.child(this._config.firebase_path));
-        this._accessory.ready(this._accessoryReady.bind(this));
-        
-        this._db.authWithPassword({
-            email: this._config.username,
-            password: this._config.password
-        });
-        
-        this._serviceMap = {};
-        this._characteristicMap = {};
-        
-        for (var serviceName of this._config.services) {
-            this._serviceMap[serviceName] = new Service[serviceName]();
-            this._characteristicMap[serviceName] = {};
+        if (AccessoryBase.prototype.isPrototypeOf(config) == true) {
+            // this Accessory is being constructed as a member of a platform
+            this.log = log;
+            this._accessory = config;
+            this._config = { Name: 'Unknown' };
+            this._ready = false;
+            
+            // create the service and characteristic map structures
+            this._serviceMap = {};
+            this._characteristicMap = {};
+            
+            // Generally the accessory should be ready
+            // and this will not be an event driven callback
+            this._accessory.ready((function() {
+                for (var serviceName of this._accessory.Services) {
+                    this._serviceMap[serviceName] = new Service[serviceName]();
+                    this._characteristicMap[serviceName] = {};
+                }
+                this._accessoryReady();
+                
+                if ((this._accessory.AccessoryInformation !== undefined) &&
+                    (this._accessory.AccessoryInformation.Name !== undefined)
+                ) {
+                    this._config.Name = this._accessory.AccessoryInformation.Name;
+                }
+                
+                this._ready = true;
+            }).bind(this));
+            
+            Object.createProperty(this, "IsReady", { get: function() { return this._ready; } });
+            });
+        } else {
+            // this Accessory is being constructed standalong
+            this.log = log;
+            this._config = config;
+            
+            this._db = new Firebase(this._config.firebase_host);
+            this._accessory = new AccessoryBase(this._db.child(this._config.firebase_path));
+            
+            this._db.authWithPassword({
+                email: this._config.username,
+                password: this._config.password
+            });
+            
+            this._serviceMap = {};
+            this._characteristicMap = {};
+            
+            for (var serviceName of this._config.services) {
+                this._serviceMap[serviceName] = new Service[serviceName]();
+                this._characteristicMap[serviceName] = {};
+            }
+
+            this._accessory.ready(this._accessoryReady.bind(this));
         }
     }
     
