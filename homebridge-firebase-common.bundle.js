@@ -1023,17 +1023,18 @@ function hasOwnProperty(obj, prop) {
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./support/isBuffer":4,"_process":3,"inherits":2}],6:[function(require,module,exports){
 // homebridge-firebase-common
-
+var Platform = require('./lib/platform.js');
 var Service = require('./lib/service.js');
 var Accessory = require('./lib/accessory.js');
 var HapTypes = require('hap-nodejs-types');
 
 module.exports = {
+    Platform: Platform,
     Accessory: Accessory,
     Service: Service,
     Types: HapTypes
 }
-},{"./lib/accessory.js":7,"./lib/service.js":8,"hap-nodejs-types":10}],7:[function(require,module,exports){
+},{"./lib/accessory.js":7,"./lib/platform.js":8,"./lib/service.js":9,"hap-nodejs-types":11}],7:[function(require,module,exports){
 var EventEmitter = require('events');
 var util = require('util');
 var Service = require('./service.js');
@@ -1111,6 +1112,11 @@ function Accessory(ref) {
         }
         return this;
     };
+    
+        
+    Object.defineProperty(this, 'IsReady', {
+        get: function() { return _ready; }
+    });
      
     Object.defineProperty(this, 'Services', {
         get: function() {
@@ -1133,7 +1139,82 @@ module.exports = Accessory;
 
 
 
-},{"./service.js":8,"events":1,"util":5}],8:[function(require,module,exports){
+},{"./service.js":9,"events":1,"util":5}],8:[function(require,module,exports){
+// platform.js
+var EventEmitter = require('events');
+var util = require('util');
+
+var Accessory = require('./accessory.js');
+
+function createAccessoryProp(self, accessoryName, accessory) {
+    Object.defineProperty(self, accessoryName, {
+        get: function() { return accessory; }
+    });
+}
+
+function Platform(ref, filter) {
+    var _shadow = {};
+    var _ref = ref;
+    var _ready = false;
+    var _accessories = [];
+    var _accessoryNames = [];
+    var _filter = filter || /.*/;
+    
+    _filter = new RegExp(_filter); // in case it's passed as a string
+    
+    function _testReady() {
+        if (_ready) return;
+        for (var n = 0; n < _accessories.length; n++) {
+            if (_accessories[n].IsReady == false) return;
+        }
+        
+        _ready = true;
+        this.emit('ready');
+    }
+    
+    function _scanAccessories(snapshot) {
+        var data = snapshot.val();
+        
+        for (var k in data) {
+            if (_filter.test(k) == true) {
+                var accessory = new Accessory(_ref.child(k));
+                _accessories.push(accessory);
+                _accessoryNames.push(k);
+                createAccessoryProp(this, k, accessory);
+            }
+        }
+        
+        for (var n = 0; n < _accessories.length; n++) {
+            _accessories[n].ready(_testReady.bind(this));
+        }
+    }
+    
+    function _onAuth(authData) {
+        if (authData) {
+            _ref.off('value');
+            
+            _ref.once('value', _scanAccessories.bind(this));
+        }
+    }
+    
+    this.ready = function(callback) {
+        if (_ready) {
+            callback();
+        } else {
+            this.on('ready', callback);
+        }
+        return this;
+    };
+        
+    Object.defineProperty(this, 'IsReady', {
+        get: function() { return _ready; }
+    });
+    
+    Object.defineProperty(this, 'Accessories', {
+        get: function() { return this._accessoryNames.slice(0); }
+    });
+}
+},{"./accessory.js":7,"events":1,"util":5}],9:[function(require,module,exports){
 // generic service
 
 var EventEmitter = require('events');
@@ -1217,7 +1298,7 @@ function Service(ref, serviceName) {
 
 util.inherits(Service, EventEmitter);
 module.exports = Service;
-},{"events":1,"util":5}],9:[function(require,module,exports){
+},{"events":1,"util":5}],10:[function(require,module,exports){
 var exports = module.exports = {};
 
 //HomeKit Types UUID's
@@ -1310,14 +1391,14 @@ exports.WINDOW_COVERING_CURRENT_POSITION_CTYPE = stPre + "6D" + stPost;
 exports.WINDOW_COVERING_OPERATION_STATE_CTYPE = stPre + "72" + stPost;
 exports.CURRENTHEATINGCOOLING_CTYPE = stPre + "0F" + stPost;
 exports.TARGETHEATINGCOOLING_CTYPE = stPre + "33" + stPost;
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = {
   Service: require('./lib/gen/HomeKitTypes').Service,
   Characteristic: require('./lib/gen/HomeKitTypes').Characteristic,
   TypeUUIDs: require('./accessories/types')
 }
 
-},{"./accessories/types":9,"./lib/gen/HomeKitTypes":11}],11:[function(require,module,exports){
+},{"./accessories/types":10,"./lib/gen/HomeKitTypes":12}],12:[function(require,module,exports){
 var Characteristic = {};
 var Service = {};
 
