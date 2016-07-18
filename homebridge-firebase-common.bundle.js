@@ -1214,6 +1214,9 @@ function Platform(ref, filter) {
         get: function() { return this._accessoryNames.slice(0); }
     });
 }
+
+util.inherits(Platform, EventEmitter);
+module.exports = Platform;
 },{"./accessory.js":7,"events":1,"util":5}],9:[function(require,module,exports){
 // generic service
 
