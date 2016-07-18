@@ -1,8 +1,8 @@
 {
-  "name": "homebridge-platform",
+  "name": "firebase-platform",
   "version": "0.0.1",
   "description": "Firebase platform plugin for Homebridge",
-  "main": "index.js",
+  "main": "firebase-platform.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

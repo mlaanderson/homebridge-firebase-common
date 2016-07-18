@@ -12,7 +12,7 @@ module.exports = function(homebridge) {
     Accessory = homebridge.hap.Accessory;
     uuid = homebridge.hap.uuid;
     
-    homebridge.registerPlatform("homebridge-platform", "FirebasePlatform", FirebasePlatform);
+    homebridge.registerPlatform("firebase-platform", "FirebasePlatform", FirebasePlatform);
 }
 
 class FirebasePlatform {

@@ -1,8 +1,8 @@
 {
-  "name": "homebridge-accessory",
+  "name": "firebase-accessory",
   "version": "0.1.0",
   "description": "An example homebridge plugin using the homebridge-firebase-common library",
-  "main": "homebridge-accessory.js",
+  "main": "firebase-accessory.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

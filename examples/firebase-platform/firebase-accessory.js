@@ -1,72 +1,37 @@
 "use strict";
-var Firebase = require('firebase');
-var AccessoryBase = require('homebridge-firebase-common').Accessory;
-var Types = require('hap-nodejs-types');
 
-var Service, Characteristic;
-
-module.exports = function(homebridge) {
-    Service = homebridge.hap.Service;
-    Characteristic = homebridge.hap.Characteristic;
-    homebridge.registerAccessory("homebridge-accessory", "FirebaseAccessory", FirebaseAccessory);
-}
 
 class FirebaseAccessory {
-    constructor(log, config) {
-        if (AccessoryBase.prototype.isPrototypeOf(config) == true) {
-            // this Accessory is being constructed as a member of a platform
-            this.log = log;
-            this._accessory = config;
-            this._config = { Name: 'Unknown' };
-            this._ready = false;
-            
-            // create the service and characteristic map structures
-            this._serviceMap = {};
-            this._characteristicMap = {};
-            
-            // Generally the accessory should be ready
-            // and this will not be an event driven callback
-            this._accessory.ready((function() {
-                for (var serviceName of this._accessory.Services) {
-                    this._serviceMap[serviceName] = new Service[serviceName]();
-                    this._characteristicMap[serviceName] = {};
-                }
-                this._accessoryReady();
-                
-                if ((this._accessory.AccessoryInformation !== undefined) &&
-                    (this._accessory.AccessoryInformation.Name !== undefined)
-                ) {
-                    this._config.Name = this._accessory.AccessoryInformation.Name;
-                }
-                
-                this._ready = true;
-            }).bind(this));
-            
-            Object.createProperty(this, "IsReady", { get: function() { return this._ready; } });
-            
-        } else {
-            // this Accessory is being constructed standalong
-            this.log = log;
-            this._config = config;
-            
-            this._db = new Firebase(this._config.firebase_host);
-            this._accessory = new AccessoryBase(this._db.child(this._config.firebase_path));
-            
-            this._db.authWithPassword({
-                email: this._config.username,
-                password: this._config.password
-            });
-            
-            this._serviceMap = {};
-            this._characteristicMap = {};
-            
-            for (var serviceName of this._config.services) {
+    constructor(log, accessory, Service, Characteristic) {
+        // this Accessory is being constructed as a member of a platform
+        this.log = log;
+        this._accessory = accessory;
+        this._config = { Name: 'Unknown Accessory' };
+        this._ready = false;
+        this.name = this._config.Name;
+        
+        // create the service and characteristic map structures
+        this._serviceMap = {};
+        this._characteristicMap = {};
+        
+        // Generally the accessory should be ready
+        // and this will not be an event driven callback
+        this._accessory.ready((function() {
+            for (var serviceName of this._accessory.Services) {
                 this._serviceMap[serviceName] = new Service[serviceName]();
                 this._characteristicMap[serviceName] = {};
             }
-
-            this._accessory.ready(this._accessoryReady.bind(this));
-        }
+            this._accessoryReady();
+            
+            if ((this._accessory.AccessoryInformation !== undefined) &&
+                (this._accessory.AccessoryInformation.Name !== undefined)
+            ) {
+                this._config.Name = this._accessory.AccessoryInformation.Name;
+                this.name = this._config.Name;
+            }
+            
+            this._ready = true;
+        }).bind(this));
     }
     
     /**
@@ -150,6 +115,26 @@ class FirebaseAccessory {
         // just set the property and the AccessoryBase
         // will update the Firebase database.
         this.Accessory.log("_setHandler", this.Service, this.Characteristic, value);
+
+        if (
+            (this.Service == "Window") &&
+            (this.Characteristic == "TargetPosition") &&
+            (this.Accessory._accessory.Window.Characteristics.indexOf('HoldPosition') >= 0)
+        ) {
+            // check to see if the window is moving, if so stop it before changing
+            // the target position
+            if (this.Accessory._accessory.Window.PositionState != Characteristic.PositionState.STOPPED) {
+               this.Accessory._accessory.Window.HoldPosition = true;
+
+               setTimeout((function() {
+                   this.Accessory._accessory.Window.HoldPosition = false;
+                   this.Accessory._setHandler.bind(this)(value, callback);
+               }).bind(this), 1000);
+
+               return;
+            }
+        }
+
         this.Accessory._accessory[this.Service][this.Characteristic] = value;
         callback(null, this.Accessory._accessory[this.Service][this.Characteristic]);
     }
@@ -189,7 +174,8 @@ class FirebaseAccessory {
         }
         return services;
     }
+        
+    get IsReady() { return this._ready; }
 }
 
-module.exports.FirebaseAccessory = FirebaseAccessory;
-
+module.exports = FirebaseAccessory;
