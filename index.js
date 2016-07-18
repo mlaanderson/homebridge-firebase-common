@@ -20,7 +20,7 @@ function addProp(self, o, sn, cn) {
 function DeviceDescriptor(deviceRoot) {
    
     this.addService = function(serviceName, optionalCharacteristics, defaultData) {
-        if (false == serviceName in Types.Service) {
+        if (false === (serviceName in Types.Service)) {
             throw "ERROR: Invalid Service Name (" + serviceName + ")";
         }
         
@@ -30,14 +30,14 @@ function DeviceDescriptor(deviceRoot) {
         
         if ((optionalCharacteristics === undefined) || (optionalCharacteristics == null)) {
             optionalCharacteristics = [];
-        } else if (util.isBoolean(optionalCharacteristics) == true) {
+        } else if (util.isBoolean(optionalCharacteristics) === true) {
             if (optionalCharacteristics) {
                 optionalCharacteristics = service.OptionalCharacteristics;
             } else {
                 optionalCharacteristics = [];
             }
-        } else if (util.isArray(optionalCharacteristics) == false) {
-            if ((util.isObject(optionalCharacteristics) == true) && (typeof defaultData == "undefined")) {
+        } else if (util.isArray(optionalCharacteristics) === false) {
+            if ((util.isObject(optionalCharacteristics) === true) && (typeof defaultData == "undefined")) {
                 defaultData = optionalCharacteristics;
                 optionalCharacteristics = [];
             } else {
@@ -54,7 +54,7 @@ function DeviceDescriptor(deviceRoot) {
             var characteristicName = characteristics[n];
             var characteristic = Types.Characteristic[characteristicName];
 
-            if (true == characteristicName in defaultData) {
+            if (true === characteristicName in defaultData) {
                 result.Characteristics[characteristicName] = defaultData[characteristicName];
             } else {
                 switch (characteristic.format) {
