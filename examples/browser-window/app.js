@@ -1,7 +1,7 @@
 // app.js
 
 var db = new Firebase("https://atskylights.firebaseio.com");
-var myWindow;
+var myAccessory;
 
 function Initialize() {
     db.onAuth(db_onAuth);
@@ -11,10 +11,10 @@ function db_onAuth(authData) {
     if (authData) {
         // initialize the window
         $('body').empty().append($('<div>').text('Loading...'));
-        myWindow = new homebridge.Accessory(db.child(db.getAuth().uid).child('00:a0:50:0b:18:29'));
-        myWindow.ready(displayInterface);
+        myAccessory = new homebridge.Accessory(db.child(db.getAuth().uid).child('00:a0:50:0b:18:29'));
+        myAccessory.ready(displayInterface);
     } else {
-        myWindow == null;
+        myAccessory == null;
         // show the login
         $('body').empty().append(
             $('<div>').append(
@@ -46,37 +46,37 @@ function login_Click(e) {
 }
 
 function open_Click(e) {
-    if (myWindow && myWindow.Window) {
-        if (myWindow.Window.PositionState != homebridge.Types.Characteristic.PositionState.STOPPED) {
-            myWindow.Window.HoldPosition = true;
-            myWindow.Window.TargetPosition = 50;
+    if (myAccessory && myAccessory.Window) {
+        if (myAccessory.Window.PositionState != homebridge.Types.Characteristic.PositionState.STOPPED) {
+            myAccessory.Window.HoldPosition = true;
+            myAccessory.Window.TargetPosition = 50;
             setTimeout(open_Click, 1000);
             return;
         }
         
-        myWindow.Window.HoldPosition = false;
-        myWindow.Window.TargetPosition = 100;
+        myAccessory.Window.HoldPosition = false;
+        myAccessory.Window.TargetPosition = 100;
     }
 }
 
 function stop_Click(e) {
-    if (myWindow && myWindow.Window) {
-        myWindow.Window.TargetPosition = 50;
-        myWindow.Window.HoldPosition = true;
+    if (myAccessory && myAccessory.Window) {
+        myAccessory.Window.TargetPosition = 50;
+        myAccessory.Window.HoldPosition = true;
     }
 }
 
 function close_Click(e) {
-    if (myWindow && myWindow.Window) {
-        if (myWindow.Window.PositionState != homebridge.Types.Characteristic.PositionState.STOPPED) {
-            myWindow.Window.HoldPosition = true;
-            myWindow.Window.TargetPosition = 50;
+    if (myAccessory && myAccessory.Window) {
+        if (myAccessory.Window.PositionState != homebridge.Types.Characteristic.PositionState.STOPPED) {
+            myAccessory.Window.HoldPosition = true;
+            myAccessory.Window.TargetPosition = 50;
             setTimeout(close_Click, 1000);
             return;
         }
         
-        myWindow.Window.HoldPosition = false;
-        myWindow.Window.TargetPosition = 0;
+        myAccessory.Window.HoldPosition = false;
+        myAccessory.Window.TargetPosition = 0;
     }
 }
 
@@ -103,9 +103,9 @@ function displayInterface() {
         )
     );    
 
-    for (var n = 0; n < myWindow.Services.length; n++) {
-        var serviceName = myWindow.Services[n];
-        var service = myWindow[serviceName];
+    for (var n = 0; n < myAccessory.Services.length; n++) {
+        var serviceName = myAccessory.Services[n];
+        var service = myAccessory[serviceName];
         $('#tree').append(
             $('<li>').text(serviceName).append(
                 $('<ul>', { 'id': serviceName })
