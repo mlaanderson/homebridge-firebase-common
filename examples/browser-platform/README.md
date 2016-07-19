@@ -19,6 +19,8 @@ accessories. If you have the firebase-platform instance running on a Homebridge
 server you will see the change notifications populate to HomeKit apps.
 
 ## TODO
+Implement the homebridge.Device creation tool in this app.
+
 The next step for development in this project is to develop a series of 
 example widgets that will respond to and update the Firebase database, and
 thus complete the example implementations.
