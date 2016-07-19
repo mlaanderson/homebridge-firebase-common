@@ -1,16 +1,49 @@
 var platform;
-var db = new Firebase("https://atskylights.firebaseio.com");
+var db;
+
 
 function Initialize() {
-    db.onAuth(db_onAuth);
+    if ((typeof(Storage) !== "undefined") && (localStorage.getItem('firebase_host') != null)) {
+        db = new Firebase(localStorage.getItem('firebase_host'));
+        db.onAuth(db_onAuth);
+    } else {
+        $('body').empty().append(
+            $('<h3>').text('Connect to Firebase'),
+            $('<p>').text('Enter the Firebase URL below. After connecting to Firebase and ' + 
+                'authenticating with an email and password, the Platform will scan the ' +
+                'Firebase reference including the authenticated user\'s UID for entries. ' +
+                'Entries should show up at https://[YOUR_FIREBASE_URL].firebaseio.com/[UID]/'),
+            $('<div>').append(
+                $('<label for="firebase_host">').text('Firebase URL: '),
+                $('<input type="url" id="firebase_host" size="40" placeholder="https://<YOUR_FIREBASE_URL>.firebaseio.com">')
+            ),
+            $('<div>').append(
+                $('<button type="button">').text('Connect...').on('click', setDatabase)
+            ),
+            $('<div id="status">')
+        );
+    }
 }
 
+function setDatabase() {
+    try {
+        db = new Firebase($('#firebase_host').val());
+        
+        if (typeof(Storage) !== "undefined") {
+            localStorage.setItem('firebase_host', $('#firebase_host').val());
+        }
+        
+        db.onAuth(db_onAuth);
+    } catch (error) {
+        $('#status').text(error);
+    }
+}
 
 function db_onAuth(authData) {
     if (authData) {
         // initialize the window
         $('body').empty().append($('<div>').text('Loading...'));
-        platform = new homebridge.Platform(db.child(db.getAuth().uid), /^[0-9a-f]{2}/i);
+        platform = new homebridge.Platform(db.child(db.getAuth().uid));
         platform.ready(displayInterface);
     } else {
         platform == null;
