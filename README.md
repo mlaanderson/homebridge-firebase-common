@@ -13,8 +13,13 @@ e.g. ```var accessory = new homebridge.Accessory(ref)```
 
 ## Usage
 
-The library is designed to be used by Accessory or Platform implementations on Homebridge or
-by web based user interfaces on the browser.
+The library is designed to be used by Accessory or Platform implementations on Homebridge, 
+by web based user interfaces on the browser and by widget implementations.
+
+This library acts as a common interface connecting widgets, Homebridge and browser UIs to 
+the same Firebase backend, making it easier to implement the entire structure.
+
+![Overview](https://github.com/mlaanderson/homebridge-firebase-common/blob/master/concept_diagram.svg)
 
 See the examples directory for both implementations.
 
