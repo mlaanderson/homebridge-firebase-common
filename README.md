@@ -19,7 +19,7 @@ by web based user interfaces on the browser and by widget implementations.
 This library acts as a common interface connecting widgets, Homebridge and browser UIs to 
 the same Firebase backend, making it easier to implement the entire structure.
 
-![Overview](https://github.com/mlaanderson/homebridge-firebase-common/blob/master/concept_diagram.svg)
+![Overview](https://cdn.rawgit.com/mlaanderson/homebridge-firebase-common/master/concept_diagram.svg)
 
 See the examples directory for both implementations.
 
